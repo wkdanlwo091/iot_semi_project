@@ -1,0 +1,211 @@
+package server;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Scanner;
+
+import msg.Msg;
+
+public class Server {
+   /* 2020.03.09 PC Server & Client 구축 
+    * 기능
+    * Server 열기 (Port + Socket) : 서버 시작 
+    * Receiver : Client 에서 msg 수신
+    * Sender : BroadCast. 전체에게 메시지 송신  ( Thread )
+    * Sender 2 : Whisper.. Target IP 특정 IP에 메시지 송신 
+    */
+
+   int port;// 포트 
+   ServerSocket serverSocket;//서버 소켓 
+   Socket socket;
+   
+   HashMap<String,ObjectOutputStream> maps = new HashMap<>();
+   // Constructor // 
+   public Server() { }
+   public Server(int port)throws IOException {
+      serverSocket = new ServerSocket(port);
+      System.out.println("server opening with port number "+port+"....");
+      Runnable r = new Runnable() { 
+         @Override
+         public void run() {
+            while(true) {
+               Socket socket= null;
+               try {
+               socket = serverSocket.accept();
+               System.out.println("Server is Ready");
+               makeOut(socket);
+               System.out.println("connected client: "+socket.getInetAddress());               
+               new Receiver(socket).start();
+               System.out.println("Receiver Thread with socket started");
+               }catch(Exception e) {
+                  e.printStackTrace();
+                  System.out.println("Server Thread Error");
+               }
+            }
+         }
+      };
+      // serverSocket 이  null ( socket이 닫히지 않았을 경우에는 항상 다시 소켓을 대기시켜야 한다. )
+//      if (serverSocket != null) {
+//         System.out.println("new Thread(r)start");
+         new Thread(r).start();
+   //}
+   };
+   
+   
+   // 소켓생성과 접속자를 감지는 makeout 함수 //에서 소켓을 열었다. 
+   public void makeOut(Socket socket) throws IOException {
+      OutputStream os;
+      ObjectOutputStream oos;
+      os = socket.getOutputStream();
+      oos = new ObjectOutputStream(os);
+      maps.put(socket.getInetAddress().toString(), oos);
+      System.out.println("Visitor ip : " + socket.getInetAddress().toString());//소켓의 어드레스를 스트링 변환한다. --> ip가 된다. 
+      System.out.println("Visitor size : " + maps.size());// 방문자 사이즈를 정한다. 
+   }  	
+   // Receiver 쓰레드 생성 //
+   class Receiver extends Thread {
+      InputStream is;
+      ObjectInputStream ois;
+//      OutputStream os;
+//      ObjectOutputStream oos;
+      Socket socket;    
+      public Receiver(Socket socket) throws IOException{
+         this.socket = socket;
+         is = socket.getInputStream();
+         ois = new ObjectInputStream(is);
+         System.out.println("inputStream made"+socket.getPort());
+//         os = socket.getOutputStream();
+//         oos = new ObjectOutputStream(os);
+//         System.out.println("outputStream made" + socket.getPort());
+//         //Hashmap map 에 접속한 IP 주소와 보내온 Object(msg 형태)로 put(저장?)한다. 
+//         maps.put(socket.getInetAddress().toString(), oos);
+//         // maps 의 사이즈를 통해 몇개가 접속중인지 확인 // 
+//         System.out.println("Total visitors: "+maps.size());
+      }	
+         // 실제 실행되는 쓰레드. //
+         @Override
+         public void run() {            
+            System.out.println("Receiver Thread Run ");
+            while(ois != null) {
+               Msg msg = null;
+            try {
+               // msg 객체로 Object를 받는다. //  
+               msg = (Msg) ois.readObject();
+               System.out.println(msg.getId() + ":" + "Send msg to:"+msg.getTid() + "msg:" + msg.getTxt());
+               // 받아온 msg 의 txt 값이 q 이면 종료 후 maps 에서 해당 아이디 삭제 // 
+               sendMsg(msg);
+            }catch(Exception e) {
+               System.out.println("Receiver Thread Error, Visitor Exited");
+               // 비정상 종료시 q 를 누른 것과 같이 삭제 시킨다. // 
+               maps.remove(socket.getInetAddress().toString());
+               System.out.println(socket.getInetAddress() + ":Exit");
+               System.out.println("Visitors:" + maps.size());
+               break;
+            }
+         }	
+         // 일련의 과정이 다 끝나고, 소켓과 input을 종료시켜야 한다. //
+            try {
+               if(ois != null) {
+                  ois.close();
+               }
+               if(socket != null) {
+                  socket.close();
+               }
+            }catch(Exception e){
+               e.printStackTrace();
+            }
+      }			
+   }		
+   			
+   // 서버에서 직접 메시지를 보낼 수 있도록 함수 생성 // 
+   public void serverSend() {
+      Scanner sc = new Scanner(System.in);
+      while(true) {
+         System.out.println("Server - Input Target ip :");
+         String tip= "/";
+         tip += sc.nextLine();
+         System.out.println("Server - Input message : ");
+         String txt = sc.nextLine();
+         Msg msg = null;
+         if(txt.equals("q"))
+            break;
+         if(tip == null || tip.equals("")) {
+            msg = new Msg("Admin",txt,null);
+         }else {
+            msg = new Msg("Admin",txt,tip);
+         }	
+         sendMsg(msg);
+      }		
+      sc.close();
+   }		
+   public void sendMsg(Msg msg) {
+      String ip = msg.getTid();
+      if(ip == null || ip.equals("")) {//ip가 없으면 브로드캐스팅 
+         Sender sender = new Sender(msg);
+         sender.start();
+      }else {
+         Sender2 sender2 = new Sender2(msg);
+         sender2.start();
+      }		
+   }		
+   class Sender extends Thread{//브로드 캐스팅 
+      Msg msg;
+      public Sender(Msg msg) {
+         this.msg = msg;
+      }		
+
+      @Override
+      public void run() {
+         Collection<ObjectOutputStream> cols = maps.values();
+         Iterator<ObjectOutputStream> its = cols.iterator();
+         while(its.hasNext()) {
+            try {
+               its.next().writeObject(msg);
+            }catch(IOException e) {
+               e.printStackTrace();
+            }
+         }	
+      }		
+   }		
+
+   class Sender2 extends Thread{
+      Msg msg;
+      public Sender2 (Msg msg) {
+         this.msg = msg;
+      }
+      @Override
+      public void run() {
+         // ip 는 msg가 보내온 Target ID // 
+         String pad = "/70.12.231.248";// 패드의 아이피 주소 
+         System.out.println("Sender2: "+ msg.getId()+msg.getTxt()+msg.getTid());
+         try {
+            maps.get(pad).writeObject(msg);
+         }catch(IOException e) {
+            e.printStackTrace();
+         }
+      }
+   }
+   
+   public static void main(String[] args) {
+      Server server = null;
+      try {
+//         System.out.println("Input port number");
+//         Scanner sc = new Scanner(System.in);
+//         int port = Integer.parseInt(sc.nextLine());
+//         sc.close();
+         server = new Server(9999);
+         server.serverSend();
+      } catch (IOException e) {
+         e.printStackTrace();
+      }
+      //server.serverSend();
+   }
+}

@@ -1,0 +1,4 @@
+<script>
+	location.href='webapp.top';
+	<!--localhost/web_spring2 로 연결하면 webapp.top 컨트롤러로 연결한다. -->
+</script>

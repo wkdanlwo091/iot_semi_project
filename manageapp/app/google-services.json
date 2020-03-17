@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "444867635455",
+    "firebase_url": "https://iotsemi-e026f.firebaseio.com",
+    "project_id": "iotsemi-e026f",
+    "storage_bucket": "iotsemi-e026f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444867635455:android:f53f7439d2dd99678fc4ca",
+        "android_client_info": {
+          "package_name": "com.example.manageapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "444867635455-gh17h75f816f44dmknifgmg7ie7rling.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoZAizbzx8oNWE5G-WDEU9uvYU3t4kL54"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "444867635455-gh17h75f816f44dmknifgmg7ie7rling.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

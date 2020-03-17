@@ -1,0 +1,221 @@
+package tcpip2;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Scanner;
+
+
+public class Server {// 패드서버와 tcp ip 통신하는 웹서버
+	//패드클라이언트에서 http로 데이터 전송하므로 tcp ip Receiver는 사용하지 않는다. 
+   int port;
+   ServerSocket serverSocket;
+   HashMap<String, ObjectOutputStream> maps = new HashMap<>();
+   boolean aflag = true; // while roop 안에서 사용할 flag
+   public Server() {
+   }
+   // 포트를 받아오는 인스턴스 메써드 //
+   public Server(int port) throws IOException {
+      serverSocket = new ServerSocket(port);
+      System.out.println("Start Server");
+
+      // 소켓에 서브 쓰레드 생성 //
+      Runnable r = new Runnable() {
+         @Override
+         public void run() {
+             Socket socket = null;
+
+            // 소켓을 계속 새로 만들기 떄문에 멤버변수가 아닌 쓰레드 안의 while 안에 넣기. //
+            while (aflag) {
+               try {
+                  System.out.println("Server is Ready.. ");
+                  socket = serverSocket.accept();
+                  System.out.println(socket.getInetAddress() + ": Connected");
+                  // 소켓에서 어떤 IP 를 사용했는지 확인할 수 있다. //
+                  // 소켓이 만들어지면 makeOut 이라는 함수 호출 //  
+                  makeOut(socket);
+                  new Receiver(socket).start();
+
+                  // outputstream 을 만들어주고 끝낼 예정
+               } catch (IOException e) { 
+                  e.printStackTrace();
+               }
+            }
+         }
+      };
+      new Thread(r).start();
+   }
+   public void makeOut(Socket socket) throws IOException{
+      OutputStream os;
+      ObjectOutputStream oos;
+      os = socket.getOutputStream();
+      oos = new ObjectOutputStream(os);
+      maps.put(socket.getInetAddress().toString(),oos);
+      System.out.println("Visitors:"+maps.size());
+   }
+   // Client 의 Sender 와 통신할 Server 의 Receiver //
+   class Receiver extends Thread {
+      InputStream is;
+      ObjectInputStream ois;
+      // Receiver 에 소켓이 있기때문에 여기서 oos 만든다. //
+      OutputStream os;
+      ObjectOutputStream oos;
+      Socket socket;
+      public Receiver(Socket socket) throws IOException {
+    	  System.out.println("receiver start ");
+         // Client 에서는 Output stream , Server 에서는 Input Stream //
+         this.socket = socket;
+         is = socket.getInputStream();
+         ois = new ObjectInputStream(is);
+      }
+      @Override
+      public void run() {
+         // while : Client 와 연결이 끊어지지 않는 한 계속 //
+         while (ois != null) {
+            Msg msg = null;
+            try {
+               // Client 에서 writeUTF , Server 에서 readUTF //
+               // 만약 Client 가 비정상 종료를 하면 readUTF 에서 에러가 난다. //
+               msg = (Msg) ois.readObject();
+               // 받은 data를 찍는다. //
+               System.out.println(socket.getInetAddress() + ":" + msg.getId() + ":" + msg.getTxt());
+               /*
+               if (msg.getTxt().equals("q")) {
+                  System.out.println(socket.getInetAddress() + msg.getId() + ":Exit");
+                  // q 를 누르면 나간 것이므로 //
+                  Thread.sleep(1000);
+                  maps.remove(socket.getInetAddress().toString());
+                  System.out.println("Visitors:" + maps.size());
+                  break;
+               }
+               */
+               // 브로드캐스트 //
+               sendMsg(msg);
+            } catch (Exception e) {
+               e.printStackTrace();
+               // 비정상 종료허여도 어떤 사람이 나가는지 확인 가능. //
+               maps.remove(socket.getInetAddress().toString());
+               System.out.println(socket.getInetAddress() + ":Exit");
+               System.out.println("Visitors:" + maps.size());
+               break; // dis.readUTF 에 문제가 생기면 while roop 중단.
+            }
+         }
+         try {
+            if (ois != null) {
+               ois.close();
+            }
+            if (socket != null) {
+
+               socket.close();
+            }
+         } catch (Exception e) {
+            e.printStackTrace();
+         }
+
+      }
+
+   }
+
+   class Sender extends Thread {
+      Msg msg;
+
+      public Sender(Msg msg) {
+         this.msg = msg;
+      }
+
+      @Override
+      public void run() {
+         // HashMap 에 있는 oos 를 꺼낸다음 for 문을 돌리면서 전송한다. //
+
+         Collection<ObjectOutputStream> cols = maps.values();
+         Iterator<ObjectOutputStream> its = cols.iterator();
+         while (its.hasNext()) {
+            try {
+               its.next().writeObject(msg);
+            } catch (IOException e) {
+               // TODO Auto-generated catch block
+               e.printStackTrace();
+            }
+         }
+      }
+
+   }
+
+   // sender 2 생성 , 귓속말 기능//
+   class Sender2 extends Thread {
+      Msg msg;
+
+      public Sender2(Msg msg) {
+         this.msg = msg;
+      }
+
+      @Override
+      public void run() {
+         String ip = msg.getTid();
+         try {
+            maps.get(ip).writeObject(msg);
+         } catch (IOException e) {
+            e.printStackTrace();
+         }
+
+      }
+
+   }
+
+   // 접속한 사용자에게 메시지 보내기.//
+   public void sendMsg(Msg msg) {
+
+      String ip = msg.getTid();
+      // null 을 항상 먼저 비교하자. //
+      if (ip == null || ip.equals("")) {
+         // 전체에 broadcast //
+         Sender sender = new Sender(msg);
+         sender.start();
+      } else {
+         // 한명에게 //
+         Sender2 sender2 = new Sender2(msg);
+         sender2.start();
+
+      }
+   }
+
+   public void serverStart() {
+      Scanner sc = new Scanner(System.in);
+      while (true) {
+         System.out.println("Input ip");
+         String ip = sc.nextLine();
+         System.out.println("Input Msg");
+         String txt = sc.nextLine();
+         Msg msg = null;
+         if (txt.equals("q"))
+            break;
+         // 귓속말 기능을 넣기위해 ip도 입력받는다. constructor 에도 ip 추가
+         if (ip == null || ip.equals("")) {
+            msg = new Msg("Admin", txt, null);
+         } else {
+            msg = new Msg("Admin", txt, ip);
+         }
+         sendMsg(msg);
+      }
+      sc.close();
+   }
+   // 메인 쓰레드 //
+   public static void main(String[] args) {
+      Server server = null;
+      try {
+         // server 호출 = 쓰레드 실행 //
+         server = new Server(8888);
+         server.serverStart();
+      } catch (IOException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+   }
+}

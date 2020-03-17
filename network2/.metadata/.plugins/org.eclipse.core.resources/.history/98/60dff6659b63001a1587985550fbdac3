@@ -1,0 +1,6 @@
+package clientp;
+public class ClientTest {
+	public static void main(String[] args) {
+		Client client = new Client("70.12.231.248", 9999, "jmj");//클라이언트 아이피 , 패드 서버 포트 
+	}
+}

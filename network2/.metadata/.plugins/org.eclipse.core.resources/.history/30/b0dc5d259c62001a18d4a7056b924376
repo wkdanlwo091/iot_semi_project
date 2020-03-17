@@ -1,0 +1,8 @@
+package clientp;
+public class ClientTest {
+	public static void main(String[] args) {
+		Client client = new Client("70.12.224.75", 9999, "jmj");
+	}
+}
+//70.12.225.91", 9999 jhm 서버 
+//포트 번호 8888 

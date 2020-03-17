@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
+    <wb-module deploy-name="example_can_delete">
+        <wb-resource deploy-path="/" source-path="/web" tag="defaultRootSource"/>
+        <property name="context-root" value="example_can_delete"/>
+        <property name="java-output-path" value="/example_can_delete/build/classes"/>
+    </wb-module>
+</project-modules>
