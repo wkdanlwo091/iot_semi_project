@@ -6,8 +6,14 @@
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
-		<item key="selection" value="Retry"/>
+		<item key="selection" value="sendingOrstopped"/>
 		<list key="findhistory">
+			<item value="sendingOrstopped"/>
+			<item value="sendingorstopped"/>
+			<item value="sendingor"/>
+			<item value="SendData"/>
+			<item value="senddata"/>
+			<item value="send"/>
 			<item value="retry"/>
 			<item value="receiver"/>
 		</list>

@@ -1,0 +1,18 @@
+{
+    "telemetry.machineId": "4a6163fe7a776350417f55d5ee6f584e4f633ac80b4b7f2a454aa1a6ea29f16f",
+    "openedPathsList": {
+        "workspaces3": [
+            {
+                "id": "4538873020ef664c125e1f3d2e359315",
+                "configURIPath": "file:///c%3A/Users/wkdan/Desktop/iot_semi_project/network/.metadata/codemix.code-workspace"
+            },
+            {
+                "id": "ef312669ce78c0a53f7ba44cc3946a7b",
+                "configURIPath": "file:///c%3A/network/.metadata/codemix.code-workspace"
+            }
+        ],
+        "files2": []
+    },
+    "theme": "vs-dark",
+    "themeBackground": "#221a0f"
+}

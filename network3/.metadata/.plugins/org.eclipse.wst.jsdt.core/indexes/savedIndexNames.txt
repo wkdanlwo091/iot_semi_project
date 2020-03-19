@@ -1,9 +1,1 @@
-INDEX VERSION 1.4+C:\network3\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
-3895160542.index
-1243057733.index
-2066433882.index
-4015822709.index
-2682419461.index
-3141907446.index
-4014978532.index
-2263691095.index
+INDEX VERSION 1.4+C:\Users\wkdan\Desktop\iot_semi_project\network3\.metadata\.plugins\org.eclipse.wst.jsdt.core\indexes
