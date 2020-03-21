@@ -1,17 +1,6 @@
 package top.makery.gas.view;
 
 
-import javafx.application.Platform;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Task;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import top.makery.gas.MainApp;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -19,36 +8,44 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Random;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ResourceBundle;
 
+import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import msg.Msg;
 import serial.SerialConnect;
-
-//label¿¡ Á¢±ÙÇÏ±â À§ÇØ ÀÎ½ºÅÏ½º º¯¼ö¸¦ Ãß°¡ÇÑ´Ù.
-//¿©±â¼­ sender receiver thread ±¸Çö??
-// run¿¡¼­ task¸¦ µ¹¸®´Â°Ô ÃÖ¼±ÀÎ °Í °°´Ù. 
-
-public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸¦ º¸³½´Ù. 
-	 	
-    @FXML
+import top.makery.gas.MainApp;
+//labelì— ì ‘ê·¼í•˜ê¸° ìœ„í•´ ì¸ìŠ¤í„´ìŠ¤ ë³€ìˆ˜ë¥¼ ì¶”ê°€í•œë‹¤.
+//ì—¬ê¸°ì„œ sender receiver thread êµ¬í˜„??
+// runì—ì„œ taskë¥¼ ëŒë¦¬ëŠ”ê²Œ ìµœì„ ì¸ ê²ƒ ê°™ë‹¤. 
+public class GasOverviewController {//í…Œì´ë¸”ì— gas ë°ì´í„°ì™€ sent sending ë°ì´í„°ë¥¼ ë³´ë‚¸ë‹¤. 
+    
+	@FXML
     private Label ppm;
     @FXML
     private Label sendingOrstopped;
     private MainApp mainApp;
-    
     Socket socket;
 	Sender sender;
 	boolean flag = true; //
 	SendData sendData;
 	Receiver receiver;
-	
 	String myIp;
 	int myPort;
 	String myCID;
-
+    private double percent = 0;
+    public int currentGas = 0;
+	
+	
 	public void ClientExample(String ip, int port, String CID) {
 		while (flag) {
 			try {
@@ -75,24 +72,25 @@ public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸
 		myIp = ip;
 		myPort = port;
 		myCID = CID;
-		sender = new Sender(socket); // Sender class is runnable implemented class.
-		Msg msg = new Msg(CID, null, null); // This is for client id to be displayed in the listview of
+		sender = new Sender(socket); 
+		Msg msg = new Msg(CID, null, "car1"); 
 		sender.setMsg(msg);
 		sender.setIp(ip);
 		sender.setPort(port);
 		new Thread(sender).start(); // this line will start the Thread.
-		//¿©±â ¾Æ·¡¼­ºÎÅÍ´Â Task ÀÌ¿ë
+		//ì—¬ê¸° ì•„ë˜ì„œë¶€í„°ëŠ” Task ì´ìš©\
+		System.out.println("hahah");
 		receiver = new Receiver(socket);
 		receiver.setIp(ip);
 		receiver.setPort(port);
 		receiver.setSender(sender);
 		receiver.start();
 	}	
-		
-	public class SendData implements Runnable{// ·£´ı µ¥ÀÌÅÍ º¸³»±â 
+	public class SendData implements Runnable{// ëœë¤ ë°ì´í„° ë³´ë‚´ê¸° 
 		boolean flag = false;
 		Sender sender;
 		String CID;
+		Msg msg;
 		public SendData() {
 		}
 		public SendData(Sender sender) {
@@ -102,13 +100,12 @@ public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸
 		public void setFlag(boolean flag) {
 			this.flag = flag;
 		}
+		public void setMsg(Msg msg) {
+			this.msg = msg;
+		}
 		@Override
 		public void run() {       
-			IntegerProperty value = new SimpleIntegerProperty(0);
-	        //¿©±â ¾Æ·¡¼­ºÎÅÍ Task ÀÌ¿ë
-			Task<Void> task = new Task<Void>() {
-	                @Override
-	                protected Void call() {
+	        //ì—¬ê¸° ì•„ë˜ì„œë¶€í„° Task ì´ìš©
 	                	while(true) {
 	                		if(flag == false) {
 	                			continue;
@@ -118,61 +115,19 @@ public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸
 	        				} catch (InterruptedException e) {
 	        					e.printStackTrace();
 	        				}
+	        				
 	        				System.out.println("Sending random number");
-	        				Random r = new Random();
-	        				int data = r.nextInt(100);
-
-	        				Msg msg = new Msg(CID, data + "");
+	        				int data = currentGas;
+	        				Msg msg = new Msg(CID, currentGas + "", "car1");
 	        				sender.setMsg(msg);
-	        				new Thread(sender).start();// °ª ÇÑ°³ º¸³»±â 
-	                        Platform.runLater(() -> value.setValue(data));
+	        				changeGas(msg.getTxt());
+	        				new Thread(sender).start();// ê°’ í•œê°œ ë³´ë‚´ê¸° 
 	                	}
-	                }
-	            };
-	            Thread th = new Thread(task);
-	            th.setDaemon(true);
-	            th.start();//¿©±â¼­ ¸®½Ã¹ö¸¦ ±¸ÇöÇØ¾ß ÇÑ´Ù. 
-	            ppm.textProperty().bind(value.asString());
-	            
-				StringProperty value2 = new SimpleStringProperty("");
-
-				Task<Void> task2 = new Task<Void>() {
-	                @Override
-	                protected Void call() {
-	                		
-	                        Platform.runLater(() -> value2.setValue("Receiving"));
-						return null;
-
-	                }
-	            };
-	            Thread th2 = new Thread(task2);
-	            th2.setDaemon(true);
-	            th2.start();//¿©±â¼­ ¸®½Ã¹ö¸¦ ±¸ÇöÇØ¾ß ÇÑ´Ù. 
-	            sendingOrstopped.textProperty().bind(value2);
-
-	            /*
-	            
-			while (true) {
-				if (flag == false) {
-					continue;
-				}
-				try {
-					Thread.sleep(1500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				System.out.println("Sending random number");
-				Random r = new Random();
-				int data = r.nextInt(100);
-
-				Msg msg = new Msg(CID, data + "");
-				sender.setMsg(msg);
-				new Thread(sender).start();// °ª ÇÑ°³ º¸³»±â 
-			}
-			*/
 		}
 	}
-
+	public void initialize(URL url, ResourceBundle rb) {
+	}    
+    
 	public class Sender implements Runnable {
 		OutputStream os;
 		ObjectOutput oos;
@@ -180,10 +135,8 @@ public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸
 		String IP;
 		int PORT;
 		Msg msg;
-
 		public Sender() {
 		}
-
 		public Sender(Socket socket) {
 			this.socket = socket;
 			try {
@@ -193,15 +146,12 @@ public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸
 				e.printStackTrace();
 			}
 		}
-
 		public Msg getMsg() {
 			return msg;
 		}
-
 		public void setMsg(Msg msg) {
 			this.msg = msg;
 		}
-
 		public void setIp(String ip) {
 			this.IP = ip;
 		}
@@ -209,7 +159,6 @@ public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸
 		public void setPort(int port) {
 			this.PORT = port;
 		}
-
 		@Override
 		public void run() {
 			if (oos != null) {
@@ -245,14 +194,17 @@ public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸
 		String IP;
 		int PORT;
 		String CID;
-
 		SendData sendData;
-	 
-		SerialConnect mj;
+		SerialConnect mj = null;
 		public Receiver() {
 		}
-
 		public Receiver(Socket socket) {
+			try {
+				//mj = new SerialConnect("COM9");
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 			this.socket = socket;
 			try {
 				is = socket.getInputStream();
@@ -264,8 +216,8 @@ public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸
 		public void setSender(Sender sender) {
 			this.sender = sender;
 			sendData = new SendData(sender);
-			new Thread(sendData).start();/// sendData ½º·¹µå ½ÃÀÛ 
-			CID = sender.getMsg().getId();
+			new Thread(sendData).start();/// sendData ìŠ¤ë ˆë“œ ì‹œì‘ 
+			CID = sender.getMsg().getTid();
 		}
 		public void setIp(String ip) {
 			this.IP = ip;
@@ -275,41 +227,62 @@ public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸
 		}
 		@Override
 		public void run() {
-			
 			while (ois != null) {
 				Msg msg = null;
 				try {
 					msg = (Msg) ois.readObject();
 					System.out.println("From tabserver : " + msg.getId());
 					System.out.println("From tabserver : " + msg.getTxt());
+					System.out.println("between");
 					System.out.println("From tabserver : " + msg.getTid());
-					if (msg.getTxt().equals("1")) {
-						sendData.setFlag(true);
-						new Thread(sendData).start();
-					} else if (msg.getTxt().equals("0")) {
-						sendData.setFlag(false);
-						
-						
-				        StringProperty value = new SimpleStringProperty("");
-				        Task<Void> task = new Task<Void>() {
-			                @Override
-			                protected Void call() {
-			                    // Update the GUI on the JavaFX Application Thread
-			                    Platform.runLater(() -> value.setValue("stopped"));
-			                    return null;
-			                }
-			            };
-			            Thread th = new Thread(task);
-			            th.setDaemon(true);
-			            th.start();//¿©±â¼­ ¸®½Ã¹ö¸¦ ±¸ÇöÇØ¾ß ÇÑ´Ù. 
-			            
-			            
-			            
-			        //¾Æ·¡ ÄÚµåµéÀ» À§¿¡¼­ ÀÛ¼ºÇÏ¿´´Ù. 
-			        sendingOrstopped.textProperty().bind(value);
-
+					//ì°¨ ì†ë„ì— ë”°ë¼ì„œ ë°°ê¸°ê°€ìŠ¤ëŸ‰ì´ ë³€í•œë‹¤. 
+					//ì†ë„ 0ë¶€í„° 200ê¹Œì§€ ë¼ë©´ 
+					if (msg.getTid().equals("engine")) {
+						String id = "11111111";
+						String data = "";
+						if (msg.getTxt().equals("1")) {
+							data = "0000000000000001";
+							sendData.setFlag(true);
+							changeStatus(msg.getTxt());
+						} else if (msg.getTxt().equals("0")) {
+							data = "0000000000000002";
+							sendData.setFlag(false);
+							changeStatus(msg.getTxt());
+						}
+						String msg2 = id + data;
+						try {
+							//ì‹œë¦¬ì–¼ í¬íŠ¸ 
+							//mj.send(msg2);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
+					}
+					if (msg.getTid().equals("speed")) {
+						String id = "11111111";
+						String data = "";
+						if (msg.getTxt().equals("1")) {
+							//ì†ë„ 20ì¦ê°€ 
+							data = "0000000000000003";
+							//changeGas(msg.getTxt());
+							sendData.setFlag(true);
+						} else if (msg.getTxt().equals("0")) {
+							//ì†ë„ 20í•˜ë½ 
+							data = "0000000000000004";
+							//changeGas(msg.getTxt());
+							sendData.setFlag(true);
+						}
+//						sendData.setMsg(msg);
+//						new Thread(sendData).start();/// sendData ìŠ¤ë ˆë“œ ì‹œì‘ 
+						String msg2 = id + data;
+						try {
+							//ì‹œë¦¬ì–¼ í¬íŠ¸ ì „ì†¡ 
+							//mj.send(msg2);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				} catch (Exception e) {
+					System.out.println(e);
 					while (true) {
 						try {
 							System.out.println("Trying to reconnect to server");
@@ -334,16 +307,99 @@ public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸
 			}
 		}
 	}
-    public GasOverviewController() {
+
+	public GasOverviewController() {
     }
+    
+	public void changeGas(String msgtext){
+		System.out.println("changeGas ë€ ");
+		Task<Void> task = null;
+		IntegerProperty value = new SimpleIntegerProperty(currentGas);
+		if (msgtext.equals("1")) {
+			System.out.println("changeGas2 ë€");
+			task = new Task<Void>() {
+				@Override
+				protected Void call() {
+					Platform.runLater(() -> value.set(currentGas+20));
+					return null;
+				}
+			};
+			currentGas += 20;
+		} else if (msgtext.equals("0")) {
+			task = new Task<Void>() {
+				@Override
+				protected Void call() {
+					Platform.runLater(() -> value.set(currentGas-20));
+					return null;
+				}
+			};
+			currentGas -= 20;
+		}
+		//task.run();
+        Thread th = new Thread(task);
+        th.setDaemon(true);
+        th.start();//ì—¬ê¸°ì„œ ë¦¬ì‹œë²„ë¥¼ êµ¬í˜„í•´ì•¼ í•œë‹¤. 
+		//ppm.setText(value.toString());
+		ppm.textProperty().bind(value.asString());
+    }
+	public void changeStatus(String msgtext) {
+		Task<Void> task = null;
+		StringProperty value = new SimpleStringProperty(msgtext);
+		IntegerProperty value2 = new SimpleIntegerProperty(currentGas);
+		if (msgtext.equals("1")) {
+			task = new Task<Void>() {
+				@Override
+				protected Void call() {
+					Platform.runLater(() -> value.set("receiving"));
+					return null;
+				}
+			};
+		} else if (msgtext.equals("0")) {
+			task = new Task<Void>() {
+				@Override
+				protected Void call() {
+					Platform.runLater(() -> value.set("stopped"));
+					Platform.runLater(() -> value2.set(0));
+					return null;
+				}
+			};
+		}
+		task.run();
+		sendingOrstopped.textProperty().bind(value);
+		if(msgtext.equals("0"))
+			ppm.textProperty().bind(value2.asString());
+	}
 	public void setMainApp(MainApp mainApp, int i, String condition) {
         this.mainApp = mainApp;
+        //sending í•˜ëŠ” labelì„ ë©ˆì¶”ì—ˆë‹¤ê³  í•˜ëŠ” task 
+        // ë‹¨ í•˜ë‚˜ì˜ labelì„ ê±´ë“œë¦¬ë ¤ê³  í•´ë„ taskë¥¼ ì‚¬ìš©í•´ì•¼ í•œë‹¤. 
+        // guiëŠ” taskë¡œ ì ‘ê·¼ 
+        /*
+        PI = new ProgressIndicator(); 
+    	DoubleProperty hungerUpdater = new SimpleDoubleProperty(.0);
 
-        //sending ÇÏ´Â labelÀ» ¸ØÃß¾ú´Ù°í ÇÏ´Â task
-        // ´Ü ÇÏ³ªÀÇ labelÀ» °Çµå¸®·Á°í ÇØµµ task¸¦ »ç¿ëÇØ¾ß ÇÑ´Ù. 
-        // gui´Â task·Î Á¢±Ù 
+        Thread thread = new Thread() {
+            @Override				  
+            public void run() { // ê¸°ì¡´ëŒ€ë¡œ ì“°ë©´ ì˜ˆì™¸ë°œìƒ (FXë“±ë¡ ìŠ¤ë ˆë“œë§Œ ì“¸ ê²ƒ)
+                while (percent < 100) {
+                    percent++;		   	
+                    System.out.println("hahah");
+                    Platform.runLater(() -> {    // Lambda Expression
+                    	hungerUpdater.setValue(percent*0.01);
+                    });
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        thread.start();
+        PI.progressProperty().bind(hungerUpdater);
+        sendingOrstopped.setText("puhhh");
+        */
         StringProperty value = new SimpleStringProperty("");
-
         Task<Void> task = new Task<Void>() {
                 @Override
                 protected Void call() {
@@ -354,12 +410,10 @@ public class GasOverviewController {//Å×ÀÌºí¿¡ gas µ¥ÀÌÅÍ¿Í sent sending µ¥ÀÌÅÍ¸
             };
             Thread th = new Thread(task);
             th.setDaemon(true);
-            th.start();//¿©±â¼­ ¸®½Ã¹ö¸¦ ±¸ÇöÇØ¾ß ÇÑ´Ù. 
-            
-        //¾Æ·¡ ÄÚµåµéÀ» À§¿¡¼­ ÀÛ¼ºÇÏ¿´´Ù. 
-        sendingOrstopped.textProperty().bind(value);
-        ClientExample("70.12.231.248", 9999, "gas"); //ÀÌ°Ô sender °¡Á®¿Â´Ù.
-
-        
+            th.start();//ì—¬ê¸°ì„œ ë¦¬ì‹œë²„ë¥¼ êµ¬í˜„í•´ì•¼ í•œë‹¤. 
+        //ì•„ë˜ ì½”ë“œë“¤ì„ ìœ„ì—ì„œ ì‘ì„±í•˜ì˜€ë‹¤. 
+        sendingOrstopped.setText("stopped");
+        //sendingOrstopped.textProperty().bind(value);
+        ClientExample("70.12.225.91", 9999, "gas"); //ì´ê²Œ sender ê°€ì ¸ì˜¨ë‹¤.
     }
 }

@@ -10,3 +10,6 @@
 2020-03-19 09:48:41,905 [main] INFO  j.exodus.env.EnvironmentImpl - Exodus environment created: C:\Users\wkdan\Desktop\iot_semi_project\network2\.metadata\com.genuitec.eclipse.webclipse.livepreview\0\store
 2020-03-19 09:48:42,495 [Worker-51: Queuing new CSS Event...] INFO  j.exodus.env.EnvironmentImpl - Exodus environment created: C:\Users\wkdan\Desktop\iot_semi_project\network2\.metadata\com.genuitec.eclipse.webclipse.livepreview\1\store
 2020-03-19 09:58:42,258 [Worker-0: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2020-03-19 12:31:24,311 [Worker-0: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.
+2020-03-20 13:29:30,687 [Worker-1: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is out-of-date. Trying to update.
+2020-03-21 13:10:22,543 [Worker-1: Loading available Gradle versions] INFO  o.e.b.c.i.u.g.PublishedGradleVersions - Gradle version information cache is up-to-date. Trying to read.

@@ -6,16 +6,23 @@
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
-		<item key="selection" value="sendingOrstopped"/>
+		<item key="selection" value="initialize"/>
 		<list key="findhistory">
-			<item value="sendingOrstopped"/>
-			<item value="sendingorstopped"/>
-			<item value="sendingor"/>
-			<item value="SendData"/>
-			<item value="senddata"/>
+			<item value="initialize"/>
+			<item value="set"/>
+			<item value="print("/>
+			<item value="print"/>
+			<item value="run"/>
+			<item value="task"/>
+			<item value="PI"/>
+			<item value="pi"/>
+			<item value="ii"/>
+			<item value="catch()"/>
+			<item value="catch"/>
 			<item value="send"/>
-			<item value="retry"/>
-			<item value="receiver"/>
+			<item value="serial"/>
+			<item value="anchor"/>
+			<item value="AnchorPane"/>
 		</list>
 		<list key="replacehistory">
 		</list>

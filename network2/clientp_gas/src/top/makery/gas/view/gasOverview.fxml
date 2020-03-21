@@ -10,24 +10,26 @@
    <children>
       <SplitPane dividerPositions="0.5" prefHeight="300.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <items>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="background">
                <children>
-                  <Text layoutX="89.0" layoutY="52.0" strokeType="OUTSIDE" strokeWidth="0.0" text="배기가스">
+                  <Text fill="WHITE" layoutX="89.0" layoutY="52.0" strokeType="OUTSIDE" strokeWidth="0.0" text="배기가스">
                      <font>
                         <Font size="29.0" />
                      </font>
                   </Text>
-                  <Label fx:id="ppm" layoutX="105.0" layoutY="109.0" text="Label">
+                  <Label fx:id="ppm" layoutX="122.0" layoutY="100.0" prefHeight="50.0" prefWidth="50.0" text="Label">
                      <font>
-                        <Font size="33.0" />
-                     </font></Label>
-                  <Label fx:id="sendingOrstopped" layoutX="105.0" layoutY="193.0" text="Label">
+                        <Font size="46.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="sendingOrstopped" layoutX="122.0" layoutY="199.0" prefHeight="50.0" prefWidth="50.0" text="Label">
                      <font>
-                        <Font size="33.0" />
-                     </font></Label>
+                        <Font size="50.0" />
+                     </font>
+                  </Label>
                </children>
             </AnchorPane>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0">
+            <AnchorPane prefHeight="200.0" prefWidth="200.0" styleClass="background">
                <children>
                   <GridPane layoutX="47.0" layoutY="126.0">
                     <columnConstraints>
