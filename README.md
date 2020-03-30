@@ -126,6 +126,6 @@ port : 8080, 80
 
 * 패드 화면 
 
-  ![Screenshot_20200317-074027_pad](./img/second.png)
+  ![Screenshot_20200317-074027_pad](./img/second.PNG)
   
 * 패드와 연결된 기기 화면 
