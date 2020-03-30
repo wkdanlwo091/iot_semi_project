@@ -6,30 +6,30 @@
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
-		<item key="selection" value="initialize"/>
+		<item key="selection" value="changeGas"/>
 		<list key="findhistory">
-			<item value="initialize"/>
-			<item value="set"/>
-			<item value="print("/>
-			<item value="print"/>
-			<item value="run"/>
-			<item value="task"/>
-			<item value="PI"/>
-			<item value="pi"/>
-			<item value="ii"/>
-			<item value="catch()"/>
-			<item value="catch"/>
-			<item value="send"/>
-			<item value="serial"/>
-			<item value="anchor"/>
-			<item value="AnchorPane"/>
+			<item value="changegas"/>
+			<item value="car1"/>
+			<item value="changeGas"/>
+			<item value="changegas 란"/>
+			<item value="changegas란"/>
+			<item value="gettid"/>
+			<item value="getid"/>
+			<item value="engine"/>
+			<item value="sending random"/>
+			<item value="currentgas"/>
+			<item value="CID"/>
+			<item value="cid"/>
+			<item value="Connected to server"/>
+			<item value="connected to server"/>
+			<item value="receiving"/>
 		</list>
 		<list key="replacehistory">
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="775"/>
-		<item key="DIALOG_Y_ORIGIN" value="173"/>
+		<item key="DIALOG_X_ORIGIN" value="865"/>
+		<item key="DIALOG_Y_ORIGIN" value="128"/>
 		<item key="DIALOG_WIDTH" value="393"/>
 		<item key="DIALOG_HEIGHT" value="523"/>
 		<item key="DIALOG_FONT_NAME" value="1|맑은 고딕|9.0|0|WINDOWS|1|-18|0|0|0|400|0|0|0|1|0|0|0|0|맑은 고딕"/>

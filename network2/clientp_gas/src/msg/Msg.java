@@ -9,21 +9,17 @@ public class Msg implements Serializable{
 	String txt;
 	String tid;
 	ArrayList<String> ips;
-
 	public Msg() {
 	}
-
 	public Msg(String id, String txt) {
 		this.id = id;
 		this.txt = txt;
 	}
-
 	public Msg(String id, String txt, String tid) {
 		this.id = id;
 		this.txt = txt;
 		this.tid = tid;
 	}
-
 	public Msg(String id, String txt, String tid, ArrayList<String> ips) {
 		this.id = id;
 		this.txt = txt;

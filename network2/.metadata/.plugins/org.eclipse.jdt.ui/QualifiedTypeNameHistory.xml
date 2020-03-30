@@ -4,7 +4,6 @@
 <fullyQualifiedTypeName name="serial.SerialConnect"/>
 <fullyQualifiedTypeName name="javafx.fxml.FXML"/>
 <fullyQualifiedTypeName name="top.makery.gas.view.GasOverviewController"/>
-<fullyQualifiedTypeName name="javafx.application.Platform"/>
 <fullyQualifiedTypeName name="javafx.beans.property.IntegerProperty"/>
 <fullyQualifiedTypeName name="javafx.beans.property.SimpleIntegerProperty"/>
 <fullyQualifiedTypeName name="java.util.concurrent.LinkedBlockingQueue"/>
@@ -25,4 +24,5 @@
 <fullyQualifiedTypeName name="javafx.beans.property.SimpleDoubleProperty"/>
 <fullyQualifiedTypeName name="java.net.URL"/>
 <fullyQualifiedTypeName name="java.util.ResourceBundle"/>
+<fullyQualifiedTypeName name="javafx.application.Platform"/>
 </qualifiedTypeNameHistroy>

@@ -27,13 +27,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import msg.Msg;
 
 public class MainActivity extends AppCompatActivity {
     // Common
     String TAG = "===";
-
     // UI
 //    TextView tvclient;
 //    TextView tvserver;
@@ -58,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         maps = new HashMap<>();
         ids = new HashMap<>();
-        makeUi();// ui 는 내가 해야 할 부분이다. ( 업그레드 터치 )ㄴ
+        makeUi();// ui 는 내가 해야 할 부분이다. ( 업그레드 터치 )
         serverReadyThread = new ServerReadyThread();
         serverReadyThread.start();
         FirebaseMessaging.getInstance().subscribeToTopic("temperature").addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -99,23 +97,18 @@ public class MainActivity extends AppCompatActivity {
         new ConnectThread(sip, sport, "pad").start();//웹서버로 연결한다.
     }
     class ServerReadyThread extends Thread {
-
         public ServerReadyThread() {
-
             try {
                 serverSocket = new ServerSocket(port);
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
         @Override
         public void run() {
             while (aflag) {
                 Socket socket = null;
                 Log.d(TAG, "Server Ready");
-
                 try {
                     socket = serverSocket.accept();
                     Log.d(TAG, "socket = serverSocket.accept()");
@@ -127,11 +120,8 @@ public class MainActivity extends AppCompatActivity {
                             setList();
                         }
                     });
-
                 } catch (IOException e) {
-
                     e.printStackTrace();
-
                     Log.d(TAG, "client disconnected");
                     maps.remove(socket.getInetAddress().toString());
                     ids.remove(socket.getInetAddress().toString());
@@ -152,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
     class SendServer extends Thread {
 
         //        String urlstr = "http://192.168.43.2:8080/webspringserver/iotclient.top";
@@ -382,7 +371,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return list;
     }
-
     public void ckbt(View v) {
         Msg msg = null;
         if (v.getId() == R.id.button) {
@@ -392,8 +380,6 @@ public class MainActivity extends AppCompatActivity {
         }
         sendMsg(msg);
     }
-
-
     // --------------------------CLIENT MODULE --------------------------------//
     String tabid = "tab1";
 //    String sip = "192.168.43.2"; // phone hotspot ip
@@ -548,7 +534,6 @@ public class MainActivity extends AppCompatActivity {
         }
         @Override
         protected void onProgressUpdate(Msg... values) {
-
             String id = values[0].getId();
             // 위에서 에러가 나면 id 에 system 이라는 값을 주었다. //
             if (id.equals("System")) {

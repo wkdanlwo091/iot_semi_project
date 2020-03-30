@@ -90,7 +90,6 @@ public class GasOverviewController {//테이블에 gas 데이터와 sent sending
 		boolean flag = false;
 		Sender sender;
 		String CID;
-		Msg msg;
 		public SendData() {
 		}
 		public SendData(Sender sender) {
@@ -100,12 +99,13 @@ public class GasOverviewController {//테이블에 gas 데이터와 sent sending
 		public void setFlag(boolean flag) {
 			this.flag = flag;
 		}
-		public void setMsg(Msg msg) {
-			this.msg = msg;
-		}
 		@Override
 		public void run() {       
+			IntegerProperty value = new SimpleIntegerProperty(0);
 	        //여기 아래서부터 Task 이용
+			Task<Void> task = new Task<Void>() {
+	                @Override
+	                protected Void call() {
 	                	while(true) {
 	                		if(flag == false) {
 	                			continue;
@@ -115,17 +115,23 @@ public class GasOverviewController {//테이블에 gas 데이터와 sent sending
 	        				} catch (InterruptedException e) {
 	        					e.printStackTrace();
 	        				}
-	        				
 	        				System.out.println("Sending random number");
-	        				int data = currentGas;
-	        				Msg msg = new Msg(CID, currentGas + "", "car1");
+	        				Random r = new Random();
+	        				int data = r.nextInt(100);
+	        				Msg msg = new Msg(CID, currentGas + "");
 	        				sender.setMsg(msg);
-	        				changeGas(msg.getTxt());
+	        				System.out.println("haha");
 	        				new Thread(sender).start();// 값 한개 보내기 
+	                        Platform.runLater(() -> value.setValue(currentGas));
 	                	}
+	                }
+	            };
+	            Thread th = new Thread(task);	
+	            th.setDaemon(true);
+	            th.start();//여기서 리시버를 구현해야 한다. 
+	            ppm.textProperty().bind(value.asString());
 		}
-	}
-	public void initialize(URL url, ResourceBundle rb) {
+	}	public void initialize(URL url, ResourceBundle rb) {
 	}    
     
 	public class Sender implements Runnable {
@@ -237,6 +243,7 @@ public class GasOverviewController {//테이블에 gas 데이터와 sent sending
 					System.out.println("From tabserver : " + msg.getTid());
 					//차 속도에 따라서 배기가스량이 변한다. 
 					//속도 0부터 200까지 라면 
+					/*
 					if (msg.getTid().equals("engine")) {
 						String id = "11111111";
 						String data = "";
@@ -281,6 +288,40 @@ public class GasOverviewController {//테이블에 gas 데이터와 sent sending
 							e.printStackTrace();
 						}
 					}
+					*/
+					//여기서 gasChange한다. 
+					if (msg.getTxt().equals("1")) {
+						sendData.setFlag(true);
+						new Thread(sendData).start();
+						StringProperty value2 = new SimpleStringProperty("");
+						Task<Void> task2 = new Task<Void>() {
+			                @Override
+			                protected Void call() {
+			                        Platform.runLater(() -> value2.setValue("receiving"));
+								return null;
+			                }
+			            };
+			            Thread th2 = new Thread(task2);
+			            th2.setDaemon(true);
+			            th2.start();//여기서 리시버를 구현해야 한다. 
+			            sendingOrstopped.textProperty().bind(value2);
+					} else if (msg.getTxt().equals("0")) {
+						sendData.setFlag(false);
+				        StringProperty value = new SimpleStringProperty("");
+				        Task<Void> task = new Task<Void>() {
+			                @Override
+			                protected Void call() {
+			                    // Update the GUI on the JavaFX Application Thread
+			                    Platform.runLater(() -> value.setValue("stopped"));
+			                    return null;
+			                }
+			            };
+			            Thread th = new Thread(task);
+			            th.setDaemon(true);
+			            th.start();//여기서 리시버를 구현해야 한다. 
+			        //아래 코드들을 위에서 작성하였다. 
+			        sendingOrstopped.textProperty().bind(value);
+					}
 				} catch (Exception e) {
 					System.out.println(e);
 					while (true) {
@@ -307,40 +348,7 @@ public class GasOverviewController {//테이블에 gas 데이터와 sent sending
 			}
 		}
 	}
-
 	public GasOverviewController() {
-    }
-    
-	public void changeGas(String msgtext){
-		System.out.println("changeGas 란 ");
-		Task<Void> task = null;
-		IntegerProperty value = new SimpleIntegerProperty(currentGas);
-		if (msgtext.equals("1")) {
-			System.out.println("changeGas2 란");
-			task = new Task<Void>() {
-				@Override
-				protected Void call() {
-					Platform.runLater(() -> value.set(currentGas+20));
-					return null;
-				}
-			};
-			currentGas += 20;
-		} else if (msgtext.equals("0")) {
-			task = new Task<Void>() {
-				@Override
-				protected Void call() {
-					Platform.runLater(() -> value.set(currentGas-20));
-					return null;
-				}
-			};
-			currentGas -= 20;
-		}
-		//task.run();
-        Thread th = new Thread(task);
-        th.setDaemon(true);
-        th.start();//여기서 리시버를 구현해야 한다. 
-		//ppm.setText(value.toString());
-		ppm.textProperty().bind(value.asString());
     }
 	public void changeStatus(String msgtext) {
 		Task<Void> task = null;
@@ -374,31 +382,6 @@ public class GasOverviewController {//테이블에 gas 데이터와 sent sending
         //sending 하는 label을 멈추었다고 하는 task 
         // 단 하나의 label을 건드리려고 해도 task를 사용해야 한다. 
         // gui는 task로 접근 
-        /*
-        PI = new ProgressIndicator(); 
-    	DoubleProperty hungerUpdater = new SimpleDoubleProperty(.0);
-
-        Thread thread = new Thread() {
-            @Override				  
-            public void run() { // 기존대로 쓰면 예외발생 (FX등록 스레드만 쓸 것)
-                while (percent < 100) {
-                    percent++;		   	
-                    System.out.println("hahah");
-                    Platform.runLater(() -> {    // Lambda Expression
-                    	hungerUpdater.setValue(percent*0.01);
-                    });
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-        thread.start();
-        PI.progressProperty().bind(hungerUpdater);
-        sendingOrstopped.setText("puhhh");
-        */
         StringProperty value = new SimpleStringProperty("");
         Task<Void> task = new Task<Void>() {
                 @Override
@@ -414,6 +397,6 @@ public class GasOverviewController {//테이블에 gas 데이터와 sent sending
         //아래 코드들을 위에서 작성하였다. 
         sendingOrstopped.setText("stopped");
         //sendingOrstopped.textProperty().bind(value);
-        ClientExample("70.12.225.91", 9999, "gas"); //이게 sender 가져온다.
+        ClientExample("172.30.1.52", 9999, "gas"); //이게 sender 가져온다.
     }
 }

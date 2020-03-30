@@ -32,6 +32,7 @@
 		<item key="WizardZipFileResourceExportPage1.STORE_CREATE_STRUCTURE_ID" value="true"/>
 		<item key="WizardZipFileResourceExportPage1.STORE_COMPRESS_CONTENTS_ID" value="true"/>
 		<list key="WizardZipFileResourceExportPage1.STORE_DESTINATION_NAMES_ID">
+			<item value="C:\Users\wkdan\Desktop\serial.zip"/>
 			<item value="C:\Users\wkdan\Desktop\clientp_fx.zip"/>
 		</list>
 	</section>
@@ -40,5 +41,9 @@
 		<list key="WizardZipFileResourceImportPage1.STORE_SOURCE_NAMES_ID">
 			<item value="C:\Users\wkdan\Desktop\tilesfx_test.zip"/>
 		</list>
+	</section>
+	<section name="WorkbenchPreferenceDialogSettings">
+		<item key="DIALOG_X_ORIGIN" value="397"/>
+		<item key="DIALOG_Y_ORIGIN" value="93"/>
 	</section>
 </section>

@@ -6,8 +6,9 @@
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
-		<item key="selection" value="Sender run"/>
+		<item key="selection" value="accept"/>
 		<list key="findhistory">
+			<item value="accept"/>
 			<item value="sender run"/>
 			<item value="retry"/>
 			<item value="sender2"/>
@@ -22,13 +23,12 @@
 			<item value="jhm"/>
 			<item value="jmj"/>
 			<item value="send"/>
-			<item value="random"/>
 		</list>
 		<list key="replacehistory">
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="1395"/>
+		<item key="DIALOG_X_ORIGIN" value="824"/>
 		<item key="DIALOG_Y_ORIGIN" value="98"/>
 		<item key="DIALOG_WIDTH" value="393"/>
 		<item key="DIALOG_HEIGHT" value="523"/>
