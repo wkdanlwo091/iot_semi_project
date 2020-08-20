@@ -83,7 +83,6 @@ public class MainActivity extends AppCompatActivity {
                 URL url = new URL(urlstr);
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.getInputStream();
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
